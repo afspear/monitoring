@@ -41,9 +41,9 @@
 			</snapshots>
 		</repository>
 		<repository>
-    <id>SarXos Repository</id>
-    <url>http://www.sarxos.pl/repo/maven2</url>
-</repository>
+			<id>SarXos Repository</id>
+			<url>http://www.sarxos.pl/repo/maven2</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -136,11 +136,16 @@
 			<version>${camel-version}</version>
 
 		</dependency>
-		
+
+		<dependency>
+			<groupId>com.github.sarxos</groupId>
+			<artifactId>webcam-capture</artifactId>
+			<version>0.3.10-RC6</version>
+		</dependency>
 		<dependency>
     <groupId>com.github.sarxos</groupId>
-    <artifactId>webcam-capture</artifactId>
-    <version>0.3.10-RC6</version>
+    <artifactId>webcam-capture-driver-ipcam</artifactId>
+    <version>0.3.10-RC7</version>
 </dependency>
 
 

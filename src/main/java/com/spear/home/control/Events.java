@@ -6,15 +6,15 @@ import java.util.Date;
 public class Events {
 
 	// for broadcasting on eventbus
-	public static class Status {
-		private String status;
+	public static class Toggle {
+		private boolean armed;
 
-		public Status(String status) {
-			this.status = status;
+		public Toggle(boolean armed) {
+			this.armed = armed;
 		}
 
-		public String getStatus() {
-			return status;
+		public boolean isArmed() {
+			return armed;
 		}
 	}
 

@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.NotActiveException;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -15,16 +16,20 @@ import com.google.common.eventbus.Subscribe;
 import com.spear.home.control.ControlEngine;
 import com.spear.home.control.ControlState;
 import com.spear.home.control.Events;
+import com.spear.home.control.RealtimeFeed;
+import com.spear.home.control.Events.Toggle;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.client.BrowserInfo;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
+import com.vaadin.server.Page.BrowserWindowResizeListener;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.Page.BrowserWindowResizeEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.ValoTheme;
@@ -58,8 +63,8 @@ public class MyVaadinUI extends UI {
 
 	@Override
 	protected void init(VaadinRequest request) {
-		// main layout
-
+		
+		
 		final MainPage mainPage = new MainPage();
 
 		setContent(mainPage);
@@ -68,20 +73,22 @@ public class MyVaadinUI extends UI {
 				ValoTheme.LABEL_BOLD + " " + ValoTheme.LABEL_HUGE);
 
 		statusLabel = mainPage.getStatusLabel();
-
-		statusLabel.setValue(ControlState.getStatus());
+		
+		
+		
 		statusLabel.addStyleName(ValoTheme.LABEL_BOLD + " "
 				+ ValoTheme.LABEL_HUGE + " " + ValoTheme.LABEL_COLORED);
 
 		arm = mainPage.getToggleAlarmButton();
 
-		arm.setCaption("Arm/Disarm");
-		arm.addStyleName(ValoTheme.BUTTON_HUGE + " " + ValoTheme.BUTTON_DANGER);
+		
+		
 
 		arm.addClickListener(new ClickListener() {
 
 			@Override
 			public void buttonClick(ClickEvent event) {
+				ControlEngine.INSTANCE.toggleMotionDectection();
 				
 
 			}
@@ -95,19 +102,61 @@ public class MyVaadinUI extends UI {
 		mainPage.getStreamVerticalLayout().setComponentAlignment(image,Alignment.MIDDLE_CENTER);
 
 		eventBus.register(this);
+		setArmedVsDisarmed();
+		
+		Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener() {
+			
+			@Override
+			public void browserWindowResized(BrowserWindowResizeEvent event) {
+				
+				if (!Page.getCurrent().getWebBrowser().isTouchDevice())
+					return;
+				// TODO Auto-generated method stub
+				
+				if (event.getHeight() < event.getWidth())
+				{
+					mainPage.getHomeMonitoringLabel().setVisible(false);
+					statusLabel.setStyleName(ValoTheme.LABEL_TINY + " " + ValoTheme.LABEL_COLORED);
+					arm.setStyleName(ValoTheme.BUTTON_SMALL + " " + ValoTheme.BUTTON_DANGER);
+				}
+				else
+				{
+					mainPage.getHomeMonitoringLabel().setVisible(true);
+					mainPage.getHomeMonitoringLabel().addStyleName(
+							ValoTheme.LABEL_BOLD + " " + ValoTheme.LABEL_HUGE);
 
+					
+					arm.setStyleName(ValoTheme.BUTTON_HUGE + " " + ValoTheme.BUTTON_DANGER);
+					
+					
+					statusLabel.addStyleName(ValoTheme.LABEL_BOLD + " "
+							+ ValoTheme.LABEL_HUGE + " " + ValoTheme.LABEL_COLORED);
+				}
+			}
+		});
+
+	}
+	
+	private void setArmedVsDisarmed()
+	{
+		if (ControlEngine.INSTANCE.armed()) {
+			statusLabel.setValue("ARMED");
+			arm.setCaption("Disarm");
+		}
+		else{
+			statusLabel.setValue("DISARMED");
+			arm.setCaption("Arm");
+		}
 	}
 
 	@Subscribe
-	public void messageStatusHander(final Events.Status status) {
-		System.out.println("Message received from the Camel: "
-				+ status.getStatus());
+	public void messageStatusHander(final Toggle toggle) {
 		MyVaadinUI.this.access(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				statusLabel.setValue(status.getStatus());
+				setArmedVsDisarmed();
 			}
 		});
 	}

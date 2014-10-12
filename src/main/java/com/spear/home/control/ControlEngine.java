@@ -4,8 +4,6 @@ import org.apache.camel.ProducerTemplate;
 
 import com.github.sarxos.webcam.Webcam;
 import com.google.common.eventbus.EventBus;
-import com.spear.home.ui.MotionDetector;
-import com.spear.home.ui.RealtimeFeed;
 
 public enum ControlEngine {
 	INSTANCE;
@@ -22,6 +20,7 @@ public enum ControlEngine {
 	public void init() {
 		bus = new EventBus();
 		webcam = Webcam.getDefault();
+		
 		webcam.open();
 		motionDetector = new MotionDetector();
 		
@@ -40,22 +39,23 @@ public enum ControlEngine {
 	
 		motionDetector.getDetecting().set(!detecting);
 		
+		bus.post(new Events.Toggle(motionDetector.getDetecting().get()) );
 		return motionDetector.getDetecting().get();
+		
 	}
 	
 	public boolean armed ()
 	{
 		return motionDetector.getDetecting().get();
 	}
-
-
-
-	public EventBus getBus() {
-		return bus;
-	}
 	
 	public void newEvent(Object event) {
 		bus.post(event);
+	}
+
+	public EventBus getBus() {
+		// TODO Auto-generated method stub
+		return bus;
 	}
 	
 
