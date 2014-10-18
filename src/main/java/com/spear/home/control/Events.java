@@ -18,17 +18,6 @@ public class Events {
 		}
 	}
 
-	public static class Result {
-		private String result;
-
-		public Result(String result) {
-			this.result = result;
-		}
-
-		public String getResult() {
-			return result;
-		}
-	}
 	
 	public static class Motion {
 		private BufferedImage image;

@@ -14,7 +14,6 @@ import com.github.sarxos.webcam.Webcam;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.spear.home.control.ControlEngine;
-import com.spear.home.control.ControlState;
 import com.spear.home.control.Events;
 import com.spear.home.control.RealtimeFeed;
 import com.spear.home.control.Events.Toggle;
@@ -137,9 +136,9 @@ public class MyVaadinUI extends UI {
 
 	}
 	
-	private void setArmedVsDisarmed()
+	private void setArmedVsDisarmed(boolean armed)
 	{
-		if (ControlEngine.INSTANCE.armed()) {
+		if (armed) {
 			statusLabel.setValue("ARMED");
 			arm.setCaption("Disarm");
 		}
@@ -156,26 +155,11 @@ public class MyVaadinUI extends UI {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				setArmedVsDisarmed();
+				setArmedVsDisarmed(toggle.isArmed());
 			}
 		});
 	}
 
-	@Subscribe
-	public void messageResultHander(final Events.Result result) {
-		System.out.println("Message received from the Camel: "
-				+ result.getResult());
-		access(new Runnable() {
-
-			@Override
-			public void run() {
-				Notification notification = new Notification("Result",
-						ControlState.getActionResult(), Type.TRAY_NOTIFICATION);
-				notification.setDelayMsec(5000);
-				notification.show(Page.getCurrent());
-			}
-		});
-	}
 	
 	@Subscribe
 	public void imageHandler(final RealtimeFeed inputStream)

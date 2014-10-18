@@ -33,15 +33,13 @@ public enum ControlEngine {
 		webcam.close();
 	}
 	
-	public boolean toggleMotionDectection ()
+	public void toggleMotionDectection ()
 	{
 		boolean detecting = motionDetector.getDetecting().get();
 	
 		motionDetector.getDetecting().set(!detecting);
 		
-		bus.post(new Events.Toggle(motionDetector.getDetecting().get()) );
-		return motionDetector.getDetecting().get();
-		
+		bus.post(new Events.Toggle(motionDetector.getDetecting().get()) );	
 	}
 	
 	public boolean armed ()
