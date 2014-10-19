@@ -10,19 +10,18 @@ public enum ControlEngine {
 	
 	private EventBus bus;
 	private Webcam webcam;
-	private MotionDetector motionDetector;
+	private MotionDetector motionDetector = MotionDetector.INSTANCE;
 	
 
 	public Webcam getWebcam() {
 		return webcam;
 	}
 
-	public void init() {
+	private ControlEngine() {
 		bus = new EventBus();
 		webcam = Webcam.getDefault();
 		
 		webcam.open();
-		motionDetector = new MotionDetector();
 		
 		new Thread(new RealtimeFeed()).start();
 		

@@ -15,6 +15,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.spear.home.control.ControlEngine;
 import com.spear.home.control.Events;
+import com.spear.home.control.MotionDetector;
 import com.spear.home.control.RealtimeFeed;
 import com.spear.home.control.Events.Toggle;
 import com.vaadin.annotations.Push;
@@ -101,7 +102,7 @@ public class MyVaadinUI extends UI {
 		mainPage.getStreamVerticalLayout().setComponentAlignment(image,Alignment.MIDDLE_CENTER);
 
 		eventBus.register(this);
-		setArmedVsDisarmed();
+		setArmedVsDisarmed(MotionDetector.INSTANCE.getDetecting().get());
 		
 		Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener() {
 			
