@@ -1,5 +1,9 @@
 package com.spear.home.control;
 
+import java.util.List;
+
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
+
 import org.apache.camel.ProducerTemplate;
 
 import com.github.sarxos.webcam.Webcam;
@@ -9,41 +13,42 @@ public enum ControlEngine {
 	INSTANCE;
 	
 	private EventBus bus;
-	private Webcam webcam;
-	private MotionDetector motionDetector = MotionDetector.INSTANCE;
-	
+	private List<Webcam> webcams;
+	private WebcamManager webcamManager;
+	private List<MotionDetector> motionDetectors;
+	private boolean detecting;
 
-	public Webcam getWebcam() {
-		return webcam;
-	}
 
 	private ControlEngine() {
 		bus = new EventBus();
-		webcam = Webcam.getDefault();
+		webcamManager = WebcamManager.INSTANCE;
+		detecting = false;
+		for (Webcam webcam : webcamManager.geWebcams()) {
+			new Thread(new RealtimeFeed(webcam)).start();
+		}
 		
-		webcam.open();
-		
-		new Thread(new RealtimeFeed()).start();
-		
+	
 	}
 
-	public void stop() {
+	public void close() {
 		
-		webcam.close();
+		webcamManager.close();
 	}
 	
 	public void toggleMotionDectection ()
 	{
-		boolean detecting = motionDetector.getDetecting().get();
-	
-		motionDetector.getDetecting().set(!detecting);
+		detecting = !detecting;
 		
-		bus.post(new Events.Toggle(motionDetector.getDetecting().get()) );	
+		for (MotionDetector motionDetector : motionDetectors) {
+			motionDetector.getDetecting().set(detecting);
+		}
+		
+		bus.post(new Events.Toggle(detecting) );	
 	}
 	
-	public boolean armed ()
+	public boolean isArmed ()
 	{
-		return motionDetector.getDetecting().get();
+		return detecting;
 	}
 	
 	public void newEvent(Object event) {

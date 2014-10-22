@@ -53,7 +53,9 @@ public class MyVaadinUI extends UI {
 	private Label statusLabel;
 	private Button arm;
 	private Image image;
-	EventBus eventBus = ControlEngine.INSTANCE.getBus();
+	ControlEngine controlEngine = ControlEngine.INSTANCE;
+	EventBus eventBus = controlEngine.getBus();
+	
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class)
@@ -102,7 +104,7 @@ public class MyVaadinUI extends UI {
 		mainPage.getStreamVerticalLayout().setComponentAlignment(image,Alignment.MIDDLE_CENTER);
 
 		eventBus.register(this);
-		setArmedVsDisarmed(MotionDetector.INSTANCE.getDetecting().get());
+		setArmedVsDisarmed(controlEngine.isArmed());
 		
 		Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener() {
 			
